@@ -10,23 +10,26 @@ void Game::play()
 
 		cout << endl;
 
-		if (!player.makeMove())
+		if (!Board::Instance().player.makeMove())
 		{
 			cout << "Sorry, you lost\nBetter luck next time!\n";
 			gameOver = true;
+			break;
 		}
 
 		cout << endl;
 
-		if (!agent.makeMove())
+		if (!Board::Instance().agent.makeMove())
 		{
 			cout << "You Won\nCongratulations!\n";
+			gameOver = true;
+			break;
 		}
 
 		cout << endl;
 	}
 
-	cout << "The game is over, the board looks like this\n\n";
+	cout << "\nThe game is over, the board looks like this\n\n";
 	Board::Instance().print();
 	cout << endl;
 }

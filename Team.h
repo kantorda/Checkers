@@ -18,8 +18,10 @@ public:
 
 	bool isPlayer = false;
 	virtual bool makeMove();
+	void surrenderChips(vector<Coord> tiles);
 protected:
 	vector<Coord> chips;
+	static void removeSpaces(string& input);
 };
 
 class Player : public Team

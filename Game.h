@@ -9,7 +9,5 @@ public:
 	~Game() = default;
 	void play();
 private:
-	Player player = Player();
-	Agent agent = Agent();
 	bool gameOver = false;
 };

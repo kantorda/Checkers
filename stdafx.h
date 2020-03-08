@@ -7,6 +7,7 @@
 #include <string>
 #include <iostream>
 #include <locale>
+#include <algorithm>
 #include "cassert"
 using namespace std;
 #endif // !PCH

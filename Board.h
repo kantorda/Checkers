@@ -19,16 +19,23 @@ public:
 	Coord(string input);
 	~Coord() = default;
 
+	bool operator==(const Coord& rhs);
+
 	void indicies(int& alpha, int& numeric);
+	static bool isValid(string coord);
+	static Coord middle(Coord start, Coord end);
 };
 
 class Board
 {
 public:
 	vector<vector<Chip>> board;
+	Player player = Player();
+	Agent agent = Agent();
 
 	static Board& Instance();
 	void print();
+	bool isValidMove(TeamType team, string move, vector<Coord> &tiles);
 private:
 	Board();
 	Board(Board const&) = delete;
