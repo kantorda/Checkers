@@ -49,6 +49,46 @@ void Coord::indicies(int& A, int& N)
 	N = numeric;
 }
 
+string Coord::toString()
+{
+	string out = "";
+
+	switch (alpha)
+	{
+	case 0:
+		out.append("A");
+		break;
+	case 1:
+		out.append("B");
+		break;
+	case 2:
+		out.append("C");
+		break;
+	case 3:
+		out.append("D");
+		break;
+	case 4:
+		out.append("E");
+		break;
+	case 5:
+		out.append("F");
+		break;
+	case 6:
+		out.append("G");
+		break;
+	case 7:
+		out.append("H");
+		break;
+	default:
+		break;
+	}
+
+
+	out.append(to_string(numeric + 1));
+
+	return out;
+}
+
 bool Coord::isValid(string coord)
 {
 	if (coord.length() != 2)
@@ -59,10 +99,25 @@ bool Coord::isValid(string coord)
 	char alpha = toupper(coord.at(0), locale()), numeric = coord.at(1);
 
 
-	if (!validAlphas.find(alpha))
+	if (validAlphas.find(alpha) == string::npos)
 		return false;
 
-	return validNumerics.find(numeric);
+	return validNumerics.find(numeric) != string::npos;
+}
+
+bool Coord::isValid(Coord coord)
+{
+	if (coord.alpha < 0 || 7 < coord.alpha)
+	{
+		return false;
+	}
+
+	if (coord.numeric < 0 || 7 < coord.numeric)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 Coord Coord::middle(Coord start, Coord end)
@@ -127,11 +182,25 @@ void Board::print()
 			}
 			else if (board[j][i].owner == TeamType::player)
 			{
-				cout << " O |";
+				if (board[j][i].king)
+				{
+					cout << " @ |";
+				}
+				else
+				{
+					cout << " O |";
+				}
 			}
 			else
 			{
-				cout << " X |";
+				if (board[j][i].king)
+				{
+					cout << " % |";
+				}
+				else
+				{
+					cout << " X |";
+				}
 			}
 		}
 		cout << " " << i + 1;
@@ -146,18 +215,21 @@ bool Board::isValidMove(TeamType team, string move, vector<Coord> &tiles)
 
 	// Split move into tile locations
 	char* cstr = new char[move.length() + 1];
-	rsize_t cstrMax = sizeof cstr;
-	strcpy_s(cstr, cstrMax, move.c_str());
+	//rsize_t cstrMax = sizeof cstr;
+	//strcpy_s(cstr, cstrMax, move.c_str());
+	strcpy(cstr, move.c_str());
 
 	vector<string> tokens;
 	const char* delim = ">";
 	char* context;
 
-	char* tok = strtok_s(cstr, delim, &context);
+	//char* tok = strtok_s(cstr, delim, &context);
+	char* tok = strtok(cstr, delim);
 	while (tok != 0)
 	{
 		tokens.push_back(string(tok));
-		tok = strtok_s(NULL, delim, &context);
+		//tok = strtok_s(NULL, delim, &context);
+		tok = strtok(NULL, delim);
 	}
 
 	// At least two moves
@@ -165,6 +237,8 @@ bool Board::isValidMove(TeamType team, string move, vector<Coord> &tiles)
 	{
 		valid = false;
 	}
+
+	delete[] cstr;
 
 	tiles.clear();
 	if (valid)
@@ -191,12 +265,13 @@ bool Board::isValidMove(TeamType team, string move, vector<Coord> &tiles)
 
 	if (valid)
 	{
+		bool wasKinged = false;
+		Chip chip = board[tiles.front().alpha][tiles.front().numeric];
+
 		for (int i = 1; i < tiles.size(); ++i)
 		{
-			Chip chip = board[tiles[i - 1].alpha][tiles[i- 1].numeric];
 			Chip endTile = board[tiles[i].alpha][tiles[i].numeric];
 			
-
 			// Tile being moved to is an empty tile
 			if (endTile.owner != TeamType::none)
 			{
@@ -210,7 +285,7 @@ bool Board::isValidMove(TeamType team, string move, vector<Coord> &tiles)
 			// Correct direction
 			if (team == TeamType::player)
 			{
-				if (!chip.king && vertical > 0)
+				if (!chip.king && !wasKinged && vertical > 0)
 				{
 					valid = false;
 					break;
@@ -218,7 +293,7 @@ bool Board::isValidMove(TeamType team, string move, vector<Coord> &tiles)
 			}
 			else // agent
 			{
-				if (!chip.king && vertical < 0)
+				if (!chip.king && !wasKinged && vertical < 0)
 				{
 					valid = false;
 					break;
@@ -253,7 +328,7 @@ bool Board::isValidMove(TeamType team, string move, vector<Coord> &tiles)
 					}
 				}
 			}
-			else if (horizontal == 1)
+			else if (abs(horizontal) == 1)
 			{
 				// Not a jump
 				if (abs(tiles[i].numeric - tiles[i - 1].numeric) != 1)
@@ -266,6 +341,12 @@ bool Board::isValidMove(TeamType team, string move, vector<Coord> &tiles)
 			{
 				valid = false;
 				break;
+			}
+
+			// Check to see if this move made the Chip a King
+			if (tiles[i].numeric == 0)
+			{
+				wasKinged = true;
 			}
 		}
 	}

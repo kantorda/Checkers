@@ -15,7 +15,12 @@ int main()
     while (resp != "Y" && resp != "Yes" && 
             resp != "y" && resp != "yes")
     {
-        cin >> resp;
+        getline(cin, resp);
+        if (resp == "q" || resp == "Q" ||
+            resp == "quit" || resp == "Quit")
+        {
+            return 0;
+        }
     }
     cout << "\n\n";
     Game().play();

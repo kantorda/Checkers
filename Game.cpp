@@ -4,6 +4,9 @@
 
 void Game::play() 
 {
+	// Initialize seed for 'random' number generator
+	srand(time(NULL));
+
 	while (!gameOver)
 	{
 		Board::Instance().print();

@@ -22,7 +22,9 @@ public:
 	bool operator==(const Coord& rhs);
 
 	void indicies(int& alpha, int& numeric);
+	string toString();
 	static bool isValid(string coord);
+	static bool isValid(Coord coord);
 	static Coord middle(Coord start, Coord end);
 };
 
